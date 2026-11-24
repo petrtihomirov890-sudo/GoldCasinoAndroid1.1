@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Gold Casino Helper</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#100e0a;color:#f6edda;font:16px Arial,sans-serif;padding:12px}
+.wrap{max-width:760px;margin:auto;transform-origin:top center}.head{display:flex;justify-content:space-between;align-items:center;margin:4px 0 14px}.brand{font-size:23px;font-weight:900;letter-spacing:1px;color:#f4c451}.sub{font-size:11px;color:#b9a77d}.card{background:#19160f;border:1px solid #9a7225;border-radius:15px;padding:13px;margin:10px 0}.row{display:flex;gap:8px;flex-wrap:wrap}.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}button{background:#282012;color:#f6d77e;border:1px solid #9a7225;border-radius:10px;padding:12px 9px;min-height:44px;font-size:14px}button.active{background:#67470d;border-color:#f5c64e}.gold{color:#f4c451;font-weight:bold}.muted{color:#b8ad95;font-size:13px}label{display:block;font-size:13px;color:#d9cba9;flex:1;min-width:0}input,select{display:block;width:100%;padding:11px;margin-top:5px;border-radius:8px;border:1px solid #80601f;background:#0f0e0b;color:#fff;font-size:16px}.result{background:#100f0c;border:1px solid #60491d;padding:12px;border-radius:9px;margin-top:10px;line-height:1.5}.resize{font-size:24px;text-align:right;touch-action:none;user-select:none}.hidden{display:none!important}.full{width:100%;margin-top:10px}.slider{width:100%}
+</style>
+</head>
+<body><main class="wrap" id="wrap">
+<div class="head"><div><div class="brand">♛ GOLD CASINO</div><div class="sub">BLACK RUSSIA • HELPER v1.0</div></div><button id="compact">Компактно</button></div>
+<section class="card" id="panel">
+<div class="gold" style="margin-bottom:12px">CASINO CONTROL</div>
+<div class="tabs"><button class="active" data-tab="bj">♠ Блэкджек</button><button data-tab="dice">🎲 Кости</button><button data-tab="cards">🂡 Карты</button></div>
+<section id="bj" class="card"><div class="gold">БЛЭКДЖЕК — ПОДСКАЗКА</div><div class="row"><label>Твои очки<input id="you" type="number" min="2" max="21" value="16"></label><label>Карта дилера<input id="dealer" type="number" min="2" max="11" value="10"></label></div><button class="full active" id="bjgo">Рассчитать ход</button><div class="result" id="bjout">Укажи карты для подсказки.</div></section>
+<section id="dice" class="card hidden"><div class="gold">ВЕРОЯТНОСТЬ ДВУХ КОСТЕЙ</div><label>Желаемая сумма<select id="sum"></select></label><button class="full active" id="dicego">Посчитать</button><div class="result" id="diceout">Выбери сумму.</div><div class="muted">Модель двух стандартных шестигранных костей.</div></section>
+<section id="cards" class="card hidden"><div class="gold">АНАЛИЗ ПЯТИ ПОКЕРНЫХ КАРТ</div><label>Карты<input id="hand" value="AS KH QD JC 10S"></label><button class="full active" id="handgo">Анализировать</button><div class="result" id="handout">Ранги: 2–10,J,Q,K,A; масти: S,H,D,C.</div></section>
+<div class="card"><div class="gold">КАЛЬКУЛЯТОР СТАВКИ</div><div class="row"><label>Баланс<input id="balance" type="number" value="1000000" min="0"></label><label>Ставка<input id="bet" type="number" value="50000" min="0"></label></div><button class="full" id="betgo">Проверить ставку</button><div class="result" id="betout">Введи баланс и ставку.</div></div>
+<div class="card"><div class="gold">РАЗМЕР ИНТЕРФЕЙСА</div><div class="row"><button data-size="80">Маленький 80%</button><button data-size="100" class="active">Средний 100%</button><button data-size="120">Большой 120%</button></div><label style="margin-top:12px">Масштаб: <output id="sizeout">100%</output><input class="slider" id="size" type="range" min="70" max="130" value="100"></label><button class="full" id="reset">Сбросить размер</button></div>
+<div class="muted">Справочный помощник. Не подключается к игре и не гарантирует выигрыш.</div><div class="resize" id="resize" aria-label="Потяни для изменения размера">↘</div>
+</section></main>
+<script>
+const $=id=>document.getElementById(id);let compact=false;
+for(let n=2;n<=12;n++)$('sum').add(new Option(n,n));
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['bj','dice','cards'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab))});
+$('compact').onclick=()=>{compact=!compact;['bj','dice','cards'].forEach(id=>$(id).classList.toggle('hidden',compact||!$(id).classList.contains('active')));$('compact').textContent=compact?'Показать всё':'Компактно'};
+$('bjgo').onclick=()=>{let y=+$('you').value,d=+$('dealer').value;if(!Number.isInteger(y)||y<2||y>21||!Number.isInteger(d)||d<2||d>11){$('bjout').textContent='Введи очки 2–21 и карту дилера 2–11.';return}let a=y>=17?'Обычно остановиться.':y<=11?'Обычно взять карту.':y<=16&&d<=6?'Обычно остановиться.':'Обычно взять карту.';$('bjout').textContent=a+' Это упрощённая базовая стратегия, не гарантия.'};
+$('dicego').onclick=()=>{let s=+$('sum').value,w=0;for(let a=1;a<=6;a++)for(let b=1;b<=6;b++)if(a+b===s)w++;$('diceout').textContent=w+' исходов из 36 • '+(w/36*100).toFixed(2)+'%'};
+$('handgo').onclick=()=>{let h=$('hand').value.trim().toUpperCase().split(/\s+/),r='23456789TJQKA',s='SHDC';if(h.length!==5||h.some(c=>c.length<2||!r.includes(c.slice(0,-1))||!s.includes(c.slice(-1)))||new Set(h).size!==5){$('handout').textContent='Неверный формат. Пример: AS KH QD JC 10S';return}let v=h.map(c=>r.indexOf(c.slice(0,-1))+2).sort((a,b)=>a-b),u=[...new Set(v)],flush=h.every(c=>c.slice(-1)===h[0].slice(-1)),straight=u.length===5&&(u[4]-u[0]===4||u.join()==='2,3,4,5,14');if(u.join()==='2,3,4,5,14')v=[1,2,3,4,5];let cnt=Object.values(v.reduce((o,x)=>(o[x]=(o[x]||0)+1,o),{})).sort((a,b)=>b-a);let name=straight&&flush?'Стрит-флеш':cnt[0]===4?'Каре':cnt[0]===3&&cnt[1]===2?'Фулл-хаус':flush?'Флеш':straight?'Стрит':cnt[0]===3?'Тройка':cnt[0]===2&&cnt[1]===2?'Две пары':cnt[0]===2?'Пара':'Старшая карта';$('handout').textContent='Комбинация: '+name};
+$('betgo').onclick=()=>{let b=+$('balance').value,s=+$('bet').value;if(!Number.isFinite(b)||!Number.isFinite(s)||b<0||s<=0){$('betout').textContent='Укажи корректные значения.';return}$('betout').textContent=s>b?'Ставка выше баланса.':'Ставка — '+(s/b*100).toFixed(1)+'% баланса. Остаток: '+(b-s).toLocaleString('ru-RU')};
+function size(v){v=Math.max(70,Math.min(130,+v||100));$('size').value=v;$('sizeout').textContent=v+'%';$('panel').style.width=v+'%';document.querySelectorAll('[data-size]').forEach(b=>b.classList.toggle('active',+b.dataset.size===v))}
+$('size').oninput=e=>size(e.target.value);document.querySelectorAll('[data-size]').forEach(b=>b.onclick=()=>size(b.dataset.size));$('reset').onclick=()=>size(100);
+let down=false,x=0,w=0;$('resize').addEventListener('pointerdown',e=>{down=true;x=e.clientX;w=$('panel').getBoundingClientRect().width;$('resize').setPointerCapture(e.pointerId)});$('resize').addEventListener('pointermove',e=>{if(down)size((w+e.clientX-x)/$('wrap').clientWidth*100)});$('resize').addEventListener('pointerup',()=>down=false);$('resize').addEventListener('pointercancel',()=>down=false);
+</script></body></html>
